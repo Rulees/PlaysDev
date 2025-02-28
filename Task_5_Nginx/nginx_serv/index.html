@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome | Devops Server</title>
+    <style>
+        /* Reset default margins & paddings */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 28px;
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+
+        section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+            margin: 20px 0;
+        }
+
+        h3 {
+            color: #0056b3;
+            margin-bottom: 10px;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        ul li {
+            margin: 8px 0;
+        }
+
+        a {
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            color: #0056b3;
+        }
+
+        .button {
+            display: inline-block;
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            text-align: center;
+            transition: background 0.3s ease;
+        }
+
+        .button:hover {
+            background-color: #0056b3;
+        }
+
+        .cpu-usage {
+            font-size: 18px;
+            font-weight: bold;
+            color: #dc3545;
+        }
+    </style>
+
+    <script>
+        function updateCpuUsage() {
+            fetch('/cpu')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('cpuUsage').innerText = data.cpu + '%';
+                })
+                .catch(error => console.error('Error fetching CPU usage:', error));
+        }
+
+        setInterval(updateCpuUsage, 5000);
+    </script>
+</head>
+
+<body>
+    <h1>Devops Server</h1>
+
+    <!-- Task 3 -->
+    <section id="task3">
+        <h3>Task 3</h3>
+        <ul>
+            <li><a href="/secondpage" class="button">Перейти на другую страничку</a></li>
+            <li><a href="/music" class="button">Скачать музыку</a></li>
+            <li><a href="/info.php" class="button">Получить информацию о PHP сервере</a></li>
+            <li><a href="/secondserver" class="button">Получить респонс с другого сервера</a></li>
+            <li><a href="/weather.php" class="button">Получить информацию о погоде от php-fpm</a></li>
+        </ul>
+    </section>
+
+    <!-- Task 4 -->
+    <section id="task4">
+        <h3>Task 4</h3>
+        <ul>
+            <li><a href="/redblue" class="button">Использование Балансировки для смены красного и синего фона</a></li>
+            <li><a href="/image1/photo.jpg" class="button">Эффект переворота картинки</a></li>
+        </ul>
+    </section>
+
+    <!-- Task 5 (CPU Usage) -->
+    <section id="task5">
+        <h3>Task 5</h3>
+        <ul>
+            <li>CPU Usage: <span id="cpuUsage" class="cpu-usage">Loading...</span></li>
+            <li><a href="/logs/task5_file1.log" target="_blank" class="button">View NGINX Log File</a></li>
+            <li><a href="/logs/task5_file2.log" target="_blank" class="button">View Cleanup Log</a></li>
+            <li><a href="/logs/task5_file3.log" target="_blank" class="button">View 5xx Errors</a></li>
+            <li><a href="/logs/task5_file4.log" target="_blank" class="button">View 4xx Errors</a></li>
+        </ul>
+    </section>
+
+</body>
+
+</html>

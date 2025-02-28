@@ -1,0 +1,48 @@
+services:
+  apache:
+    build:
+      context: ./apache
+    image: apache_compose_image
+    container_name: apache_compose
+    volumes:
+      - $PROJECT_DIR/nginx/nginx_serv:/var/www/html
+    ports:
+      - "8080:80"
+    networks:
+      - my_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 2s
+      timeout: 2s
+      retries: 3
+      start_period: 5s
+    
+
+
+  nginx:
+    build:
+      context: ./nginx
+    image: nginx_compose_image
+    container_name: nginx_compose
+    environment:
+      - EMAIL=${EMAIL}
+      - DOMAIN=${DOMAIN}
+    volumes:
+      - $PROJECT_DIR/nginx/certbot/certs:/etc/letsencrypt                      # Persist Certbot certificates
+      - $PROJECT_DIR/nginx/certbot/acme-challenges:/certbot/www                # HTTP-01 challenge storage for Certbot
+      - $PROJECT_DIR/nginx/nginx/sites-enabled:/etc/nginx/sites-enabled
+      - $PROJECT_DIR/nginx/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - $PROJECT_DIR/nginx/nginx_serv:/sites/starter
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - apache
+    networks:
+      - my_network
+    env_file:
+      - .env
+
+networks:
+  my_network:
+    driver: bridge

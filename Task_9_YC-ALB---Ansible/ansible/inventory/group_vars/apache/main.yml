@@ -1,0 +1,2 @@
+# ansible_ssh_extra_args: "-o ProxyCommand='ssh melnikov@89.169.148.69 -i ~/.ssh/YC -W %h:%p -o StrictHostKeyChecking=no' -o StrictHostKeyChecking=no"
+ansible_ssh_extra_args: "-o ProxyJump=melnikov@89.169.148.69 -A -o StrictHostKeyChecking=no"

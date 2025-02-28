@@ -1,0 +1,1 @@
+{"Modules":[{"Key":"","Source":"","Dir":"."},{"Key":"db","Source":"git::https://github.com/terraform-yc-modules/terraform-yc-postgresql.git?ref=1.0.3","Dir":".terraform/modules/db"},{"Key":"network","Source":"../../modules/network","Dir":"../../modules/network"}]}

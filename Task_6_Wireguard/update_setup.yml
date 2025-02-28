@@ -1,0 +1,93 @@
+---
+- name: Настройка обновления пакетов на приватном сервере через cron запускаемом на бастионе 
+  hosts: bastion
+  become: true
+  tasks:
+
+    - name: Ensure .ssh directory exists
+      file:
+        path: /home/melnikov/.ssh
+        state: directory
+        owner: melnikov
+        group: melnikov
+        mode: '0700'
+
+    - name: Copy private key to bastion for connection to private server
+      copy:
+        src: /root/.ssh/YC
+        dest: /home/melnikov/.ssh/YC
+        owner: melnikov
+        group: melnikov
+        mode: '0600'
+
+    - name: Create directory for script
+      file:
+        path: /opt/scripts
+        state: directory
+        owner: melnikov
+        group: melnikov
+        mode: '0755'
+
+    - name: Copy script to bastion
+      copy:
+        src: /mnt/c/Users/serge/Desktop/Letsplay/Tasks/Task_6/apt_update.sh
+        dest: /opt/scripts/apt_update.sh
+        owner: melnikov
+        group: melnikov
+        mode: '0755'
+
+    - name: Install packages
+      package:
+        name: 
+          - cron
+          - lnav
+          - iptables-persistent
+          - wireguard
+        state: present
+
+    - name: Turn ON cron service
+      service: "name=crond state=started enabled=yes"
+
+    - name: Обновление приватного сервера
+      cron:
+        name: Обновление приватного сервера
+        minute: "*"
+        #hour: "0"
+        job: "/opt/scripts/apt_update.sh"
+
+#################################################################################################################################
+
+    - name: Turn-on ipv4 forwarding to give internet for 10.10.2.10(to work as a router and establish connection between subnets)
+      lineinfile:
+        path: /etc/sysctl.conf
+        line: "net.ipv4.ip_forward = 1"
+        insertafter: EOF
+      
+    - name: Reload sysctl settings to apply forwarding
+      command: sysctl -p
+
+    # - name: Enable IP Masquerading for routing
+    #   iptables:
+    #     table: nat
+    #     chain: POSTROUTING
+    #     out_interface: eth0
+    #     source: 10.10.2.0/24
+    #     jump: MASQUERADE
+    #     state: present
+
+    # - name: Allow traffic from internal subnet to external network
+    #   iptables:
+    #     chain: FORWARD
+    #     source: 10.10.2.0/24  # Internal subnet
+    #     destination: 0.0.0.0/0  # External network (any)
+    #     jump: ACCEPT
+    #     state: present
+
+    
+    - name: Save iptables rules across reboots
+      command: |
+        iptables-save > /etc/iptables/rules.v4
+        netfilter-persistent save 
+
+
+        

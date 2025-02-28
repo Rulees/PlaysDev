@@ -1,0 +1,11 @@
+{
+    "oauth_token": "y0_AgAEA7qkhmteAATuwQAAAAEXUGrHAACmZoUX6i5KmY9Ch4BgFz5Tu3LYfA",
+    "instance_id": "fhms5idf9aq2rkbg4rjk",
+    "delete": [
+        "user-data",
+        "ssh-keys"
+    ],
+    "upsert": {
+        "user-data1": "datasource:\n  Ec2:\n    strict_id: false\nssh_pwauth: no\nusers:\n- name: melnikov\n  sudo: 'ALL=(ALL) NOPASSWD:ALL'\n  shell: /bin/bash\n  ssh_authorized_keys:\n  - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJxvfM6UA3Acknw3TBxkK6K6W9XPZnWRzeZ1cx81OPtx root@sexmachina\npackage_update: false\npackage_upgrade: false"
+    }
+}

@@ -1,0 +1,12 @@
+datasource:
+  Ec2:
+    strict_id: false                   # Disables strict ID matching for the EC2 datasource (AWS-specific)
+ssh_pwauth: no                         # Disables password-based SSH authentication (only key-based auth allowed)
+users:
+  - name: ${username}
+    sudo: ALL=(ALL) NOPASSWD:ALL       # Allow use sudo command without entring password
+    shell: /bin/bash
+    ssh_authorized_keys:
+      - ${ssh_key}
+package_update: false
+package_upgrade: false      

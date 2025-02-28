@@ -1,0 +1,45 @@
+---
+- name: Setup nginx and dependencies 
+  hosts: apache
+  become: true
+  vars:
+    nginx_version: "1.24.0"
+    php_version: "8.3"
+
+  tasks:
+
+    - name: Install packages
+      apt:
+        update_cache: yes
+        name:
+          - build-essential
+          - libpcre3 
+          - libpcre3-dev
+          - libpcrecpp0v5
+          - libssl-dev
+          - zlib1g-dev
+          - libgd-dev
+          - php{{ php_version }}
+          - php{{ php_version }}-mysql
+          - php{{ php_version }}-fpm
+          - php{{ php_version }}-cgi
+          - php
+          - libapache2-mod-php
+          - apache2
+        state: present
+
+    - name: Configure Apache to listen on port 80
+      lineinfile:
+        path: /etc/apache2/ports.conf
+        regexp: '^Listen'
+        line: "Listen 80"
+
+    - name: Restart + Enable all services
+      service:
+        name: "{{ item }}"
+        state: restarted
+        enabled: yes
+      loop:
+        - apache2
+      retries: 2
+      delay: 5

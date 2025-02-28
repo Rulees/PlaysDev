@@ -1,0 +1,337 @@
+{
+  "version": 4,
+  "terraform_version": "1.9.4",
+  "serial": 49,
+  "lineage": "bdc36acd-a9f0-01e1-b8e8-9e4f0784cdc0",
+  "outputs": {},
+  "resources": [
+    {
+      "mode": "managed",
+      "type": "yandex_compute_disk",
+      "name": "boot-disk-1",
+      "provider": "provider[\"registry.terraform.io/yandex-cloud/yandex\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "allow_recreate": null,
+            "block_size": 4096,
+            "created_at": "2025-02-04T12:16:20Z",
+            "description": "",
+            "disk_placement_policy": [
+              {
+                "disk_placement_group_id": ""
+              }
+            ],
+            "folder_id": "b1g414bhiuejkip9g1mb",
+            "id": "fhmaf0bsgv268p5f94o3",
+            "image_id": "fd8bpal18cm4kprpjc2m",
+            "labels": {},
+            "name": "boot-disk-1",
+            "product_ids": [
+              "f2eussvu3150516uh0ih"
+            ],
+            "size": 10,
+            "snapshot_id": "",
+            "status": "ready",
+            "timeouts": null,
+            "type": "network-ssd",
+            "zone": "ru-central1-a"
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMDAsImRlbGV0ZSI6MzAwMDAwMDAwMDAwLCJ1cGRhdGUiOjMwMDAwMDAwMDAwMH19"
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "yandex_compute_disk",
+      "name": "boot-disk-2",
+      "provider": "provider[\"registry.terraform.io/yandex-cloud/yandex\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "allow_recreate": null,
+            "block_size": 4096,
+            "created_at": "2025-02-04T12:16:20Z",
+            "description": "",
+            "disk_placement_policy": [
+              {
+                "disk_placement_group_id": ""
+              }
+            ],
+            "folder_id": "b1g414bhiuejkip9g1mb",
+            "id": "fhm8u903ndpi151qi9q0",
+            "image_id": "fd8bpal18cm4kprpjc2m",
+            "labels": {},
+            "name": "boot-disk-2",
+            "product_ids": [
+              "f2eussvu3150516uh0ih"
+            ],
+            "size": 10,
+            "snapshot_id": "",
+            "status": "ready",
+            "timeouts": null,
+            "type": "network-ssd",
+            "zone": "ru-central1-a"
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMDAsImRlbGV0ZSI6MzAwMDAwMDAwMDAwLCJ1cGRhdGUiOjMwMDAwMDAwMDAwMH19"
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "yandex_compute_instance",
+      "name": "bastion",
+      "provider": "provider[\"registry.terraform.io/yandex-cloud/yandex\"]",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": {
+            "allow_recreate": null,
+            "allow_stopping_for_update": null,
+            "boot_disk": [
+              {
+                "auto_delete": true,
+                "device_name": "fhmaf0bsgv268p5f94o3",
+                "disk_id": "fhmaf0bsgv268p5f94o3",
+                "initialize_params": [
+                  {
+                    "block_size": 4096,
+                    "description": "",
+                    "image_id": "fd8bpal18cm4kprpjc2m",
+                    "name": "boot-disk-1",
+                    "size": 10,
+                    "snapshot_id": "",
+                    "type": "network-ssd"
+                  }
+                ],
+                "mode": "READ_WRITE"
+              }
+            ],
+            "created_at": "2025-02-04T12:16:31Z",
+            "description": "",
+            "filesystem": [],
+            "folder_id": "b1g414bhiuejkip9g1mb",
+            "fqdn": "fhmldotbofsvqknksmbq.auto.internal",
+            "gpu_cluster_id": "",
+            "hostname": "",
+            "id": "fhmldotbofsvqknksmbq",
+            "labels": {},
+            "local_disk": [],
+            "maintenance_grace_period": "",
+            "maintenance_policy": null,
+            "metadata": {
+              "user-data": "hostname: bastion\r\ndatasource:\r\n  Ec2:\r\n    strict_id: false                   # Disables strict ID matching for the EC2 datasource (AWS-specific)\r\nssh_pwauth: no                         # Disables password-based SSH authentication (only key-based auth allowed)\r\nusers:\r\n  - name: melnikov\r\n    sudo: ALL=(ALL) NOPASSWD:ALL       # Allow use sudo command without entring password\r\n    shell: /bin/bash\r\n    ssh_authorized_keys:\r\n      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOOi2sfahLDbJz8hSEjNVmTQuyFYJYYCbbPK5zTFHqyB YC\n\r\npackage_update: false\r\npackage_upgrade: false      "
+            },
+            "metadata_options": [
+              {
+                "aws_v1_http_endpoint": 1,
+                "aws_v1_http_token": 2,
+                "gce_http_endpoint": 1,
+                "gce_http_token": 1
+              }
+            ],
+            "name": "bastion",
+            "network_acceleration_type": "standard",
+            "network_interface": [
+              {
+                "dns_record": [],
+                "index": 0,
+                "ip_address": "10.10.1.10",
+                "ipv4": true,
+                "ipv6": false,
+                "ipv6_address": "",
+                "ipv6_dns_record": [],
+                "mac_address": "d0:0d:15:6e:3a:bc",
+                "nat": true,
+                "nat_dns_record": [],
+                "nat_ip_address": "51.250.83.253",
+                "nat_ip_version": "IPV4",
+                "security_group_ids": [],
+                "subnet_id": "e9b3j93mg626m8410fps"
+              }
+            ],
+            "placement_policy": [
+              {
+                "host_affinity_rules": [],
+                "placement_group_id": "",
+                "placement_group_partition": 0
+              }
+            ],
+            "platform_id": "standard-v3",
+            "resources": [
+              {
+                "core_fraction": 100,
+                "cores": 2,
+                "gpus": 0,
+                "memory": 2
+              }
+            ],
+            "scheduling_policy": [
+              {
+                "preemptible": false
+              }
+            ],
+            "secondary_disk": [],
+            "service_account_id": "",
+            "status": "running",
+            "timeouts": null,
+            "zone": "ru-central1-a"
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMDAsImRlbGV0ZSI6MzAwMDAwMDAwMDAwLCJ1cGRhdGUiOjMwMDAwMDAwMDAwMH0sInNjaGVtYV92ZXJzaW9uIjoiMSJ9",
+          "dependencies": [
+            "yandex_compute_disk.boot-disk-1",
+            "yandex_vpc_address.addr"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "yandex_compute_instance",
+      "name": "vm-2",
+      "provider": "provider[\"registry.terraform.io/yandex-cloud/yandex\"]",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": {
+            "allow_recreate": null,
+            "allow_stopping_for_update": null,
+            "boot_disk": [
+              {
+                "auto_delete": true,
+                "device_name": "fhm8u903ndpi151qi9q0",
+                "disk_id": "fhm8u903ndpi151qi9q0",
+                "initialize_params": [
+                  {
+                    "block_size": 4096,
+                    "description": "",
+                    "image_id": "fd8bpal18cm4kprpjc2m",
+                    "name": "boot-disk-2",
+                    "size": 10,
+                    "snapshot_id": "",
+                    "type": "network-ssd"
+                  }
+                ],
+                "mode": "READ_WRITE"
+              }
+            ],
+            "created_at": "2025-02-04T12:16:31Z",
+            "description": "",
+            "filesystem": [],
+            "folder_id": "b1g414bhiuejkip9g1mb",
+            "fqdn": "fhmaf0ap2c8169p23ci0.auto.internal",
+            "gpu_cluster_id": "",
+            "hostname": "",
+            "id": "fhmaf0ap2c8169p23ci0",
+            "labels": {},
+            "local_disk": [],
+            "maintenance_grace_period": "",
+            "maintenance_policy": null,
+            "metadata": {
+              "user-data": "hostname: private\r\ndatasource:\r\n  Ec2:\r\n    strict_id: false                   # Disables strict ID matching for the EC2 datasource (AWS-specific)\r\nssh_pwauth: no                         # Disables password-based SSH authentication (only key-based auth allowed)\r\nusers:\r\n  - name: melnikov\r\n    sudo: ALL=(ALL) NOPASSWD:ALL       # Allow use sudo command without entring password\r\n    shell: /bin/bash\r\n    ssh_authorized_keys:\r\n      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOOi2sfahLDbJz8hSEjNVmTQuyFYJYYCbbPK5zTFHqyB YC\n\r\npackage_update: false\r\npackage_upgrade: false      "
+            },
+            "metadata_options": [
+              {
+                "aws_v1_http_endpoint": 1,
+                "aws_v1_http_token": 2,
+                "gce_http_endpoint": 1,
+                "gce_http_token": 1
+              }
+            ],
+            "name": "private",
+            "network_acceleration_type": "standard",
+            "network_interface": [
+              {
+                "dns_record": [],
+                "index": 0,
+                "ip_address": "10.10.2.10",
+                "ipv4": true,
+                "ipv6": false,
+                "ipv6_address": "",
+                "ipv6_dns_record": [],
+                "mac_address": "d0:0d:a7:81:59:13",
+                "nat": false,
+                "nat_dns_record": [],
+                "nat_ip_address": "",
+                "nat_ip_version": "",
+                "security_group_ids": [],
+                "subnet_id": "e9bn1fjac4fcktjn5iq7"
+              }
+            ],
+            "placement_policy": [
+              {
+                "host_affinity_rules": [],
+                "placement_group_id": "",
+                "placement_group_partition": 0
+              }
+            ],
+            "platform_id": "standard-v3",
+            "resources": [
+              {
+                "core_fraction": 100,
+                "cores": 2,
+                "gpus": 0,
+                "memory": 2
+              }
+            ],
+            "scheduling_policy": [
+              {
+                "preemptible": false
+              }
+            ],
+            "secondary_disk": [],
+            "service_account_id": "",
+            "status": "running",
+            "timeouts": null,
+            "zone": "ru-central1-a"
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMDAsImRlbGV0ZSI6MzAwMDAwMDAwMDAwLCJ1cGRhdGUiOjMwMDAwMDAwMDAwMH0sInNjaGVtYV92ZXJzaW9uIjoiMSJ9",
+          "dependencies": [
+            "yandex_compute_disk.boot-disk-2"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "yandex_vpc_address",
+      "name": "addr",
+      "provider": "provider[\"registry.terraform.io/yandex-cloud/yandex\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "created_at": "2025-02-04T12:16:20Z",
+            "deletion_protection": false,
+            "description": "",
+            "dns_record": [],
+            "external_ipv4_address": [
+              {
+                "address": "51.250.83.253",
+                "ddos_protection_provider": "",
+                "outgoing_smtp_capability": "",
+                "zone_id": "ru-central1-a"
+              }
+            ],
+            "folder_id": "b1g414bhiuejkip9g1mb",
+            "id": "e9beitstekmgregg4fmm",
+            "labels": {},
+            "name": "vm-adress",
+            "reserved": true,
+            "timeouts": null,
+            "used": true
+          },
+          "sensitive_attributes": [],
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMCwiZGVsZXRlIjozMDAwMDAwMDAwMCwidXBkYXRlIjozMDAwMDAwMDAwMH19"
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}

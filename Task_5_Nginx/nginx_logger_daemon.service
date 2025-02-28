@@ -1,0 +1,12 @@
+[Unit]
+Description=Nginx Log Daemon
+After=network.target
+
+[Service]
+ExecStart=/sites/starter/nginx_logger_daemon.sh
+Restart=always
+User=www-data
+Group=www-data
+
+[Install]
+WantedBy=multi-user.target

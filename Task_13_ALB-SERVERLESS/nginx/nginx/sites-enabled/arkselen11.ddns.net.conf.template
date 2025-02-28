@@ -1,0 +1,48 @@
+upstream apache_backend {
+    server apache:80;
+}
+
+server {
+
+    listen 80;
+    server_name ${DOMAIN};
+
+    root /sites/starter;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    ###
+    # Apache container
+    ###
+
+    location ~ \.php$ {
+        proxy_pass http://apache_backend;
+    }
+
+    location /info.php {
+        proxy_pass http://apache_backend/info.php;
+    }
+
+    ###
+    # Other
+    ###
+
+    location /secondpage {
+        root /sites/starter;
+        try_files $uri /secondpage.html;
+    }
+
+    location /music {
+        alias /sites/starter/music/;
+        default_type audio/mpeg;
+        add_header Content-Disposition 'attachment; filename="$uri"';
+        try_files $uri $uri/music.mp3 =404;
+    }
+
+    location /secondserver {
+        proxy_pass https://2ip.ru/;
+    }
+}
