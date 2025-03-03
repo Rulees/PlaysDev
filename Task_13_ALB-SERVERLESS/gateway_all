@@ -1,0 +1,41 @@
+openapi: 3.0.0
+info:
+  title: Serverless API Gateway
+  version: 1.0.0
+
+servers:
+  - url: https://your-gateway-id.apigw.yandexcloud.net
+
+paths:
+  /:
+    get:
+      x-yc-apigateway-integration:
+        type: serverless_containers
+        service_account_id: ajef2vu3kdm3ch6pksea
+        container_id: bba2o1p4aq83p7a18cp5
+
+  /{any_path}:
+    get:
+      x-yc-apigateway-integration:
+        type: serverless_containers
+        service_account_id: ajef2vu3kdm3ch6pksea
+        container_id: <NGINX_CONTAINER_ID>
+      parameters:
+        - name: any_path
+          in: path
+          required: true
+          schema:
+            type: string
+
+  /{php_file}.php:
+    get:
+      x-yc-apigateway-integration:
+        type: serverless_containers
+        service_account_id: ajef2vu3kdm3ch6pksea
+        container_id: <PHP_CONTAINER_ID>
+      parameters:
+        - name: php_file
+          in: path
+          required: true
+          schema:
+            type: string

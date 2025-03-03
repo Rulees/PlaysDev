@@ -1,18 +1,16 @@
 FROM php:8.3-apache
 
-EXPOSE 80
-
 RUN apt update && apt install --no-install-recommends -y \
     lnav \
     nano \
-    nnn  \
     curl \
+    iproute2 \
     && rm -rf /var/lib/apt/lists/*
 
-RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
-
-
+COPY entrypoint-apache.sh /entrypoint-apache.sh
 COPY nginx_serv/ /var/www/html/
 
 
-ENTRYPOINT ["apache2-foreground"]
+RUN chmod +x /entrypoint-apache.sh
+
+ENTRYPOINT ["/entrypoint-apache.sh"]

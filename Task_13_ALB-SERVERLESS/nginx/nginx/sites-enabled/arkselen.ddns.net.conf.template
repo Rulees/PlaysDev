@@ -1,10 +1,6 @@
-upstream apache_backend {
-    server apache:80;
-}
-
 server {
 
-    listen 80;
+    listen ${PORT};
     server_name ${DOMAIN};
 
     root /sites/starter;
@@ -12,18 +8,6 @@ server {
 
     location / {
         try_files $uri $uri/ =404;
-    }
-
-    ###
-    # Apache container
-    ###
-
-    location ~ \.php$ {
-        proxy_pass http://apache_backend;
-    }
-
-    location /info.php {
-        proxy_pass http://apache_backend/info.php;
     }
 
     ###
@@ -36,7 +20,8 @@ server {
     }
 
     location /music {
-        alias /sites/starter/music/;
+        # alias /sites/starter/music/;
+        root /sites/starter
         default_type audio/mpeg;
         add_header Content-Disposition 'attachment; filename="$uri"';
         try_files $uri $uri/music.mp3 =404;
