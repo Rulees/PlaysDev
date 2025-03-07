@@ -4,8 +4,8 @@ info:
   version: 1.0.0
 
 servers:
-  - url: https://your-gateway-id.apigw.yandexcloud.net
-
+- url: https://d5dktojog4d2i87ovsku.o2p3jdjj.apigw.yandexcloud.net
+- url: https://gw.arkselen.online
 paths:
   /:
     get:
@@ -19,7 +19,7 @@ paths:
       x-yc-apigateway-integration:
         type: serverless_containers
         service_account_id: ajef2vu3kdm3ch6pksea
-        container_id: <NGINX_CONTAINER_ID>
+        container_id: bba2o1p4aq83p7a18cp5
       parameters:
         - name: any_path
           in: path
@@ -32,7 +32,7 @@ paths:
       x-yc-apigateway-integration:
         type: serverless_containers
         service_account_id: ajef2vu3kdm3ch6pksea
-        container_id: <PHP_CONTAINER_ID>
+        container_id: bbagngldvnbfjetej90d
       parameters:
         - name: php_file
           in: path

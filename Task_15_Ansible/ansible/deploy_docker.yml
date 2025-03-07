@@ -1,0 +1,49 @@
+- name: Установка Docker и запуск контейнера
+  hosts: all
+  become: yes
+  tasks:
+
+    - import_role:
+        name: docker_install
+
+
+    - name: Store WebSite-Content from GitHub to remote Server
+      block:
+        - name: Remove old folder
+          file:
+            path: "/sites/starter"
+            state: absent
+
+        - name: Create new folder
+          file:
+            path: "{{ content_path }}"
+            state: directory
+            mode: '0755'
+
+        - name: Copy content from GitHub to created folder
+          git:
+            repo: "{{ git_repo  }}"
+            dest: "{{ content_path }}"
+            force: true
+
+
+    - name: Copy .env to remote server
+      copy:
+        src: "./files/.env"   # local
+        dest: "/.env"         # remote
+        mode: '0644'
+
+
+    - name: Launch/Relaunch Docker container
+      docker_container:
+        name: nginx_container
+        image: "{{ docker_image }}"
+        state: started
+        restart_policy: always
+        env_file: "/.env"
+        ports:
+          - "80:80"
+          - "443:443"
+        volumes:
+          - "{{ content_path }}/Task_5_Nginx/nginx_serv:/sites/starter"
+        recreate: yes

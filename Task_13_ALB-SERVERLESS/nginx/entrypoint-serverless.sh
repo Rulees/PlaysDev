@@ -19,7 +19,7 @@ echo "----------Using DOMAIN: $DOMAIN"
 
 # Generate file *.conf with vars from .env
 for file in /etc/nginx/sites-enabled/*.template; do
-    envsubst < "$file" > "${file%.template}"
+    envsubst '${DOMAIN} ${PORT}' < "$file" > "${file%.template}"
     rm "$file"
 done
 echo "---------Conf files generated from .template"
