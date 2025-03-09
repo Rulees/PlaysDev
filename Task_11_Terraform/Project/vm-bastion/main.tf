@@ -45,7 +45,7 @@ data "terraform_remote_state" "sg" {
 locals {
   boot_disk_name             = var.boot_disk_name != null ? var.boot_disk_name : "${var.project_prefix}--boot-disk--${var.personal_prefix}"
   linux_vm_name              = var.linux_vm_name  != null ? var.linux_vm_name  : "${var.project_prefix}--linux-vm--${var.personal_prefix}"
-  ssh_user                   = "melnikov"
+  username                   = "melnikov"
   ssh_key                    = file("/root/.ssh/YC.pub")
   private_ip                 = "10.10.1.10"
   public_ip                  = "89.169.153.231"
@@ -100,7 +100,7 @@ resource "yandex_compute_instance" "bastion" {
 
   metadata = {
     user-data = templatefile("../cloud-init.yml", {
-      ssh_user = local.ssh_user
+      username = local.username
       ssh_key = local.ssh_key
     })
   }

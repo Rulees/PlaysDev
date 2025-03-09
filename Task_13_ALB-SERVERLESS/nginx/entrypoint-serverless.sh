@@ -5,16 +5,16 @@ echo "---------Start entrypoint-serverless.sh"
 
 # Проверяем, что переменные окружения заданы
 if [ -z "$PORT" ]; then
-  echo "----------ERROR: PORT environment variable is not set!"
+  echo "----------ERROR: PORT env_var is not set!"
   exit 1
 fi
 if [ -z "$DOMAIN" ]; then
-  echo "----------ERROR: DOMAIN environment variable is not set!"
+  echo "----------ERROR: DOMAIN env_var is not set!"
   exit 1
 fi
 
-echo "----------Using PORT: $PORT"
-echo "----------Using DOMAIN: $DOMAIN"
+echo "----------Use PORT: $PORT"
+echo "----------Use DOMAIN: $DOMAIN"
 
 
 # Generate file *.conf with vars from .env

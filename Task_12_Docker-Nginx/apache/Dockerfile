@@ -6,6 +6,7 @@ RUN apt update && apt install --no-install-recommends -y \
     lnav \
     nano \
     curl \
+    iproute2 \
     && rm -rf /var/lib/apt/lists/*
 
 RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf

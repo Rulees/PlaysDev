@@ -20,7 +20,7 @@ ENV IAM_TOKEN=$IAM_TOKEN
 RUN apk add --no-cache certbot certbot-nginx python3 openssl lnav nano curl jq
 
 
-# COPY nginx_serv/ /sites/starter/                
+# COPY nginx_serv/ /sites/starter/   !!!commented ,cause we get content from github            
 COPY nginx/nginx.conf /etc/nginx/nginx.conf
 COPY nginx/sites-enabled/ /etc/nginx/sites-enabled/
 COPY entrypoint-yandex-cert.sh /entrypoint-yandex-cert.sh

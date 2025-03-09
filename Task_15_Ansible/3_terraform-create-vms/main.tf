@@ -15,7 +15,6 @@ resource "yandex_compute_disk" "boot-disk-2" {
   image_id = "fd81v21o90r8e978g95e" # fedora
 }
 
-
 # VM's
 resource "yandex_compute_instance" "ubuntu" {
   name = "ubuntu"
@@ -36,7 +35,7 @@ resource "yandex_compute_instance" "ubuntu" {
     ip_address = "10.10.1.10"
 
     nat = true
-    nat_ip_address = "89.169.144.151"
+    # nat_ip_address = "89.169.144.151"
     # nat_ip_address = yandex_vpc_address.addr["ubuntu"].external_ipv4_address[0].address 
   }
 
@@ -70,7 +69,7 @@ resource "yandex_compute_instance" "fedora" {
     ip_address = "10.10.1.20"
     
     nat = true
-    nat_ip_address = "89.169.139.61"
+    # nat_ip_address = "89.169.139.61"
     # nat_ip_address = yandex_vpc_address.addr["fedora"].external_ipv4_address[0].address 
   }
 
