@@ -1,0 +1,26 @@
+receivers:
+  - name: 'slack'
+    slack_configs:
+      - api_url: 'https://hooks.slack.com/services/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'  # Slack Webhook URL
+        channel: '#all-arkselen'
+        send_resolved: true
+
+  - name: email
+    email_configs:
+      - to: "darkmelnik777@gmail.com"
+        from: "maxik257199@mail.ru"
+        smarthost: "smtp.example.com:587"
+        auth_username: "maxik257199@mail.ru"
+        auth_identity: "maxik257199@mail.ru"
+        auth_password: "ixPeuhf34yDUS2ixZPmM"
+
+route:
+  receiver: 'slack'
+  group_by: ['alertname']
+  group_wait: 15s
+  group_interval: 1m
+  repeat_interval: 3h
+
+  # routes:
+    # - receiver: email
+      

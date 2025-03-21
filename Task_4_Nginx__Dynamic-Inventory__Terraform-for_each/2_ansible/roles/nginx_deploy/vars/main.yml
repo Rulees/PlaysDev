@@ -1,0 +1,6 @@
+nginx_server_name: "arkselen.online"
+
+nginx_upstream_enabled: true                               # Set this to false if you don't want the upstream block
+nginx_upstream_servers:
+  - { server: "10.10.1.36", port: "8081", color: "red" }   # different ports are only necessary if all server are in one place
+  - { server: "10.10.1.15", port: "8082", color: "blue" }

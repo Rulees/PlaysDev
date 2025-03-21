@@ -1,0 +1,16 @@
+java_package: "openjdk-17-jre-headless"
+java_version: "17"
+jenkins_package: "jenkins"
+firewall_ports:
+  - { port: "22", name: "ssh" }
+  - { port: "8080", name: "jenkins" }
+limits:
+  jenkins:
+    soft_core: "unlimited"
+    hard_core: "unlimited"
+    soft_fsize: "unlimited"
+    hard_fsize: "unlimited"
+    soft_nofile: 4096
+    hard_nofile: 8192
+    soft_nproc: 30654
+    hard_nproc: 30654

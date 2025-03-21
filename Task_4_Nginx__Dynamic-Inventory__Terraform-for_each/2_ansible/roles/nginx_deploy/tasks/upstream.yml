@@ -1,0 +1,7 @@
+---
+- name: Generate upstream nginx-config by template and j2
+  template:
+    src: upstream.conf.j2
+    dest: /etc/nginx/nginx.conf
+  notify: reload nginx
+  when: nginx_upstream_enabled

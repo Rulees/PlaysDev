@@ -1,0 +1,21 @@
+---
+- name: Deploy nginx + upstream if necessary
+  hosts: main
+  become: true
+  roles: 
+    - nginx_install
+    - nginx_deploy
+
+- name: Deploy nginx + upstream if necessary
+  hosts: upstream
+  become: true
+  tasks:
+    - block:
+      - name: Include "nginx_install" Role
+        include_role:
+          name: nginx_install
+
+      - name: Include "nginx_install" Role
+        include_role:
+          name: nginx_install
+      when: nginx_upstream_enabled

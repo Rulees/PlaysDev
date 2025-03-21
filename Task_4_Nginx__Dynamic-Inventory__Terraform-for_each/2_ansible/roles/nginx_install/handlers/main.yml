@@ -1,0 +1,27 @@
+---
+- name: reload nginx
+  service:
+    name: nginx
+    state: restarted
+    enabled: yes
+  retries: 2
+  delay: 5
+  become: yes
+
+- name: reload php
+  service:
+    name: "php{{ php_version }}-fpm"
+    state: restarted
+    enabled: yes
+  retries: 2
+  delay: 5
+  become: yes
+
+- name: reload apache
+  service:
+    name: apache2
+    state: restarted
+    enabled: yes
+  retries: 2
+  delay: 5
+  become: yes

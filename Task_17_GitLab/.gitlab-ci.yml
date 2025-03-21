@@ -1,0 +1,45 @@
+# stages:
+#   - build
+#   - deploy
+
+
+# cache:
+#   key: plugin-cache
+#   paths:
+#     - plugin-cache/
+
+
+# build:
+#   stage: build
+#   script:
+#     - docker build -t $YC_REGISTRY/arkselen:latest .
+#   rules:
+#     - if: '$CI_COMMIT_BRANCH == "dev"'
+
+
+# deploy:
+#   stage: deploy
+#   script:
+#     - echo $YC_TOKEN | docker login -u iam --password-stdin $YC_REGISTRY   # IAM OR YC TOKEN FROM LOCALHOST
+#     - docker push $YC_REGISTRY
+#     - |
+#       curl -X POST "$YC_SERVERLESS_ENDPOINT" \
+#         -H "Authorization: Bearer $YC_TOKEN" \
+#         -H "Content-Type: application/json" \
+#         -d '{
+#               "container_name": "my-serverless-container",
+#               "image": "$YC_REGISTRY/arkselen:latest",
+#               "resources": {
+#                 "memory": "4048M",
+#                 "cpu": "2"
+#               },
+#               "network": {
+#                 "name": "yc"  # Replace with the actual network name if needed
+#               },
+#               "service_account_id": "ajef2vu3kdm3ch6pksea",
+#               "metadata": {
+#                 "domain": "$DOMAIN"
+#               }
+#             }'
+#   rules:
+#     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'

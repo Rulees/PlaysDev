@@ -1,0 +1,9 @@
+# Dynamic inventory uses plugin from ~/.ansible/plugins/test_plugins/yacloud_compute.py
+---
+plugin: yacloud_compute
+yacloud_token: "{{ lookup('env', 'YC_TOKEN') }}"
+yacloud_clouds:
+  - "default"
+yacloud_folders:
+  - "trainee-6"
+yacloud_group_label: "dynamic-inventory"

@@ -1,0 +1,131 @@
+---
+- name: Update and install packages
+  become: yes
+  apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gnupg-agent
+      - software-properties-common
+      - wget
+      - git
+      - "{{ java_package }}"
+      # - iptables
+      # - iptables-persistent
+    state: present
+    update_cache: yes
+
+
+- name: Ensure Jenkins user exists
+  user:
+    name: jenkins
+    groups: root
+    append: yes
+
+- name: Configure system limits for Jenkins
+  blockinfile:
+    path: /etc/security/limits.conf
+    state: present
+    block: |
+      jenkins      soft     core    {{ limits.jenkins.soft_core }}
+      jenkins      hard     core    {{ limits.jenkins.hard_core }}
+      jenkins      soft     fsize   {{ limits.jenkins.soft_fsize }}
+      jenkins      hard     fsize   {{ limits.jenkins.hard_fsize }}
+      jenkins      soft     nofile  {{ limits.jenkins.soft_nofile }}
+      jenkins      hard     nofile  {{ limits.jenkins.hard_nofile }}
+      jenkins      soft     nproc   {{ limits.jenkins.soft_nproc }}
+      jenkins      hard     nproc   {{ limits.jenkins.hard_nproc }}
+
+
+# - name: Configure iptables rules for firewall
+#   iptables:
+#     chain: "INPUT"
+#     protocol: "tcp"
+#     destination_port: "{{ item.port }}"
+#     jump: "ACCEPT"
+#     state: "present"
+#   loop: "{{ firewall_ports }}"
+#   notify:
+#     - save iptables rules
+
+
+- name: Add Jenkins repository key
+  shell: |
+    wget -q -O - https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key |sudo gpg --dearmor --yes -o /usr/share/keyrings/jenkins.gpg
+
+
+- name: Add Jenkins repository to apt sources list
+  shell: |
+    sudo sh -c 'echo deb [signed-by=/usr/share/keyrings/jenkins.gpg] http://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'
+  args:
+    creates: /etc/apt/sources.list.d/jenkins.list
+
+
+- name: Install Jenkins
+  apt:
+    name: "{{ jenkins_package }}"
+    state: present
+    update_cache: yes
+
+
+# - name: Install Jenkins plugins
+#   jenkins_plugin:
+#     name: "{{ item }}"
+#     state: present
+#   loop:
+#     - git
+#     - workflow-aggregator
+#     - blueocean
+#     - credentials-binding
+#     - docker-plugin
+#     - pipeline-aws
+#     - slack
+#     - docker-commons
+#     - gitlab-branch-source
+#     - ssh-slaves
+- name: Set Java options for Jenkins
+  lineinfile:
+    path: /lib/systemd/system/jenkins.service
+    line: "JAVA_OPTS={{ java_opts }}"
+    state: present
+  notify:
+    - restart jenkins
+
+
+- name: Start and enable Jenkins service
+  systemd:
+    name: jenkins
+    state: started
+    enabled: yes
+
+
+- name: Display initial Jenkins password
+  command: cat /var/lib/jenkins/secrets/initialAdminPassword
+  register: jenkins_password
+  changed_when: false
+
+
+- name: Show Jenkins initial password
+  debug:
+    msg: "Initial Jenkins admin password: {{ jenkins_password.stdout }}"
+
+
+# - name: Create Git hook for Jenkins to trigger pipeline
+#   copy:
+#     dest: "/var/lib/jenkins/git-hooks/post-receive"
+#     content: |
+#       #!/bin/bash
+#       GIT_DIR={{ git_repo_url }}
+#       git --git-dir=$GIT_DIR --work-tree=/var/lib/jenkins/workspace JOB-DEVOPS
+#     owner: jenkins
+#     group: root
+#     mode: '0775'
+
+
+# - name: Configure GitHub webhook for Jenkins trigger
+#   github_webhook:
+#     name: "{{ git_repo_url }}"
+#     url: "http://{{ jenkins_ip_address }}:{{ jenkins_http_port }}/github-webhook/"
+#     token: "{{ github_webhook_token }}"
+#     state: present

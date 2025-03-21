@@ -1,0 +1,30 @@
+- name: Установить Docker (Ubuntu)
+  apt:
+    name: docker.io
+    state: present
+    update_cache: yes
+  when: ansible_facts['os_family'] == "Debian"
+
+- name: Установить Docker (Fedora)
+  dnf:
+    name: docker
+    state: present
+  when: ansible_facts['os_family'] == "RedHat"
+
+# - name: Установить Docker Compose
+#   get_url:
+#     url: "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)"
+#     dest: /usr/local/bin/docker-compose
+#     mode: '0755'
+
+- name: Запуск Docker
+  systemd:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: Добавить пользователя в группу Docker
+  user:
+    name: "{{ docker_user }}"
+    groups: docker
+    append: yes

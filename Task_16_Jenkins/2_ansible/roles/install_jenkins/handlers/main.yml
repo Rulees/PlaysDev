@@ -1,0 +1,7 @@
+- name: save iptables rules
+  command: netfilter-persistent save
+
+- name: restart jenkins
+  systemd:
+    name: jenkins
+    state: restarted

@@ -35,3 +35,17 @@ write_files:                           # Allow password for serial-console user
                 PasswordAuthentication yes
                 PubkeyAuthentication no
     append: true
+
+packages:
+  - lnav
+  - htop
+  - nano
+
+runcmd:
+  - echo "alias c='clear'" >> /root/.bashrc
+  - echo "alias с='clear'" >> /root/.bashrc
+  - echo "alias c='clear'" > /etc/profile.d/custom_aliases.sh
+  - echo "alias с='clear'" >> /etc/profile.d/custom_aliases.sh
+  - chmod +x /etc/profile.d/custom_aliases.sh
+  - bash -l -c 'source /etc/profile.d/custom_aliases.sh'
+  - bash -l -c 'source /root/.bashrc'

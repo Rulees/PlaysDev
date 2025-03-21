@@ -1,0 +1,35 @@
+---
+- name: Create dir for nginx content
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: '0755'
+    recurse: yes
+  loop:
+    - /sites/starter
+    - /etc/nginx
+    # - /etc/nginx/nginx.conf
+    - /etc/nginx/sites-enabled
+    - /etc/nginx/snippets
+
+- name: Copy nginx config and content to main server
+  synchronize:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: push
+    # owner: yes
+    # group: yes
+    recursive: yes
+  loop:
+    - { src: "nginx.conf", dest: "/etc/nginx/nginx.conf" }
+    - { src: "nginx_serv/", dest: "/sites/starter" }
+    - { src: "snippets", dest: "/etc/nginx/snippets" }
+
+
+- name: Generate sites-enabled nginx config
+  template:
+    src: arkselen.online.conf.j2
+    dest: /etc/nginx/sites-enabled/arkselen.online.conf
+  notify: reload nginx

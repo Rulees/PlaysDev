@@ -1,0 +1,92 @@
+log_format redblue_log '$remote_addr - $remote_user [$time_local] '
+'"$request" $status $body_bytes_sent '
+'"$http_referer" "$http_user_agent" '
+'"Reverse Proxy Upstream: $upstream_addr" "$upstream_status"';
+
+
+{% if nginx_upstream_enabled %}
+upstream color_backend {
+    {% for upstream in nginx_upstream_servers %}
+    server {{ upstream.server }}:{{ upstream.port }} max_fails=2 fail_timeout=15; # Color: {{ upstream.color }}
+    {% endfor %}
+}
+{% endif %}
+
+server {
+    listen 80 default_server;
+    if ($scheme = 'http') {
+        return 301 https://$host$request_uri;
+    }
+
+    listen 443 default_server ssl;
+    listen [::]:443 ssl ipv6only=on;
+
+    server_name {{ nginx_server_name }};
+
+    ssl_certificate /etc/letsencrypt/live/{{ nginx_server_name }}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{ nginx_server_name }}/privkey.pem;
+
+    root /sites/starter;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    location /secondpage {
+        root /sites/starter;
+        try_files $uri /secondpage.html;
+    }
+
+    location /music {
+        alias /sites/starter/music/;
+
+        default_type audio/mpeg;
+        add_header Content-Disposition 'attachment; filename="$uri"';
+
+        try_files $uri $uri/music.mp3 =404;
+    }
+
+    location /info.php {
+        proxy_pass http://127.0.0.1:8080/info.php; # на Apache сервер
+    }
+
+    location /secondserver {
+        proxy_pass https://2ip.ru/;
+    }
+
+    location /redblue {
+        proxy_pass http://color_backend;
+
+        access_log /var/log/nginx/redblue_access.log redblue_log;
+    }
+
+    location ~ \.php$ {
+        fastcgi_pass 127.0.0.1:9000;
+        include /etc/nginx/snippets/fastcgi-php.conf;
+    }
+
+    location /image1 {
+        rewrite ^/image1/(.*\.jpg)$ /images/$1 break;
+
+        image_filter rotate 90;
+        image_filter_buffer 10M;
+
+        types {
+            image/jpg jpg;
+        }
+        default_type image/jpg;
+        try_files $uri =415;
+    }
+
+    location /image2 {
+        rewrite ^/image2/(.*\.png)$ /images/$1 break;
+
+        types {
+            image/png png;
+        }
+        default_type image/png;
+
+        try_files $uri =415;
+    }
+}

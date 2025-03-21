@@ -1,0 +1,7 @@
+jenkins_home: "/var/lib/jenkins"
+java_opts: "-Djava.awt.headless=true -XX:+AlwaysPreTouch -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath={{ jenkins_home }}/log -XX:+UseG1GC -XX:+UseStringDeduplication -XX:+ParallelRefProcEnabled -XX:+DisableExplicitGC -XX:+UnlockDiagnosticVMOptions -XX:+UnlockExperimentalVMOptions -Xlog:gc=info,gc+heap=debug,gc+ref*=debug,gc+ergo*=trace,gc+age*=trace:file={{ jenkins_home }}/gc.log:utctime,pid,level,tags:filecount=2,filesize=100M -Xmx1024m -Xms1024m"
+git_repo_directory: "/var/lib/jenkins/git-repo"
+
+docker_user: "jenkins"
+jenkins_http_port: "8080"
+git_repo_url: "https://github.com/Rulees/jenkins"

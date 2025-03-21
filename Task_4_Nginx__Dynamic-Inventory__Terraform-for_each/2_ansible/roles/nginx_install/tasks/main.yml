@@ -1,0 +1,95 @@
+---
+  - name: Install packages
+    apt:
+      update_cache: yes
+      name:
+        - build-essential
+        - libpcre3 
+        - libpcre3-dev
+        - libpcrecpp0v5
+        - libssl-dev
+        - zlib1g-dev
+        - libgd-dev
+        - php{{ php_version }}
+        - php{{ php_version }}-mysql
+        - php{{ php_version }}-fpm
+        - php{{ php_version }}-cgi
+        - php
+        - libapache2-mod-php
+        - apache2
+      state: present
+
+  - name: Download NGINX from the web
+    get_url:
+      url: "http://nginx.org/download/nginx-{{ nginx_version }}.tar.gz"
+      dest: "/tmp/nginx-{{ nginx_version }}.tar.gz"
+    register: nginx_download
+
+  - name: "Set fact: Name of downloaded Nginx-package to handle with it"
+    set_fact:
+      nginx_filename: "{{ nginx_download.url | regex_replace('^.*/', '') }}"
+
+  - name: Extract Nginx from archive
+    unarchive:
+      src: "/tmp/{{ nginx_filename }}"
+      dest: /tmp/
+      remote_src: yes
+
+
+  - name: Configure NGINX
+    shell: >
+      ./configure
+      --sbin-path=/usr/bin/nginx
+      --conf-path=/etc/nginx/nginx.conf
+      --error-log-path=/var/log/nginx/error.log
+      --http-log-path=/var/log/nginx/access.log
+      --with-debug
+      --with-pcre
+      --with-http_ssl_module
+      --with-http_image_filter_module
+    args:
+      chdir: "/tmp/nginx-{{ nginx_version }}"
+
+
+  - name: Build and install NGINX
+    shell: |
+      make
+      make install
+    args:
+      chdir: "/tmp/nginx-{{ nginx_version }}"
+
+  # Configure Nginx to launch as a service
+  - name: Download NGINX init script
+    get_url:
+      url: "https://raw.githubusercontent.com/JasonGiedymin/nginx-init-ubuntu/master/nginx"
+      dest: "/etc/init.d/nginx"
+      mode: '0755'
+  
+  - name: Add NGINX to system startup
+    command: /usr/sbin/update-rc.d -f nginx defaults
+
+  - name: Configure NGINX in default config
+    lineinfile:
+      path: /etc/default/nginx
+      line: "{{ item }}"
+      create: yes
+    loop:
+      - "NGINX_CONF_FILE=/etc/nginx/nginx.conf"
+      - "DAEMON=/usr/bin/nginx"
+    notify: reload nginx
+
+
+  - name: Configure PHP-FPM to listen 127.0.0.1:9000
+    lineinfile:
+      path: /etc/php/{{ php_version }}/fpm/pool.d/www.conf
+      regexp: '^listen ='
+      line: "listen = 127.0.0.1:9000"
+    notify: reload php
+
+
+  - name: Configure Apache to listen on port 8080
+    lineinfile:
+      path: /etc/apache2/ports.conf
+      regexp: '^Listen'
+      line: "Listen 8080"
+    notify: reload apache

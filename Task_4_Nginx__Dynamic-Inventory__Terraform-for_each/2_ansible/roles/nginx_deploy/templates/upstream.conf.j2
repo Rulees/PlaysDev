@@ -1,0 +1,12 @@
+{% for upstream in nginx_upstream_servers %}
+server {
+    listen {{ upstream.port }};
+    server_name {{ upstream.server }};
+
+    location / {
+        default_type text/html;
+        return 200 '<html><body style="background-color:{{ upstream.color }};"></body></html>';
+        add_header Content-Type text/html;
+    }
+}
+{% endfor %}
