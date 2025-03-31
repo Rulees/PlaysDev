@@ -9,7 +9,7 @@ services:
     command:
       - "-promscrape.config=/etc/vmagent/vmagent.yml"
       - "-remoteWrite.url=http://prometheus:9090/api/v1/write"
-    restart: always
+    restart: unless-stopped
 
 
   prometheus:
@@ -23,7 +23,7 @@ services:
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--web.enable-remote-write-receiver'
-    restart: always
+    restart: unless-stopped
 
 
   alertmanager:
@@ -33,4 +33,4 @@ services:
       - "9093:9093"
     volumes:
       - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml
-    restart: always
+    restart: unless-stopped

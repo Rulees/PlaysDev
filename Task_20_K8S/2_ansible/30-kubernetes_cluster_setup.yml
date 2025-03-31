@@ -1,0 +1,45 @@
+---
+- name: Initialize Kubernetes Cluster
+  hosts: k8s_master
+  become: true
+  tasks:
+    - name: Ensure kubelet is enabled and started
+      systemd:
+        name: kubelet
+        enabled: yes
+        state: started
+
+    - name: Initialize Kubernetes cluster
+      shell: "kubeadm init --pod-network-cidr=10.244.0.0/16 --ignore-preflight-errors=NumCPU,Mem --cri-socket=unix:///var/run/cri-dockerd.sock >> kubeadm_init_cluster.txt"
+      args:
+        creates: /etc/kubernetes/admin.conf
+      register: kubeadm_init
+      changed_when: kubeadm_init.rc == 0
+
+    - name: Create .kube directory
+      file:
+        path: /home/{{ ansible_user }}/.kube
+        state: directory
+        mode: '0755'
+        owner: "{{ ansible_user }}"
+
+    - name: Copy Kubernetes admin.conf to user's home directory
+      copy:
+        src: /etc/kubernetes/admin.conf
+        dest: /home/{{ ansible_user }}/.kube/config
+        owner: "{{ ansible_user }}"
+        mode: '0644'
+        remote_src: yes
+
+    - name: Change ownership of admin.conf
+      file:
+        path: /home/{{ ansible_user }}/.kube/config
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: '0644'
+
+    - name: Install Flannel CNI
+      shell: "kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml >> pod_network_setup.txt"
+      changed_when: false
+      become_user: melnikov
+      

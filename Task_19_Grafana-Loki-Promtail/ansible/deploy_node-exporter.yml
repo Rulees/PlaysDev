@@ -1,0 +1,7 @@
+---
+- name: Deploy node-exporter to gain metrics for Prometheus or another log/monitor system
+  hosts: all
+  become: true
+  roles: 
+    - node_exporter_install
+    # - promtail_install

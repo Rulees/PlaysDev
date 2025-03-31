@@ -1,0 +1,200 @@
+---
+- name: Install kube-dependencies
+  hosts: all
+  become: true
+  vars:
+    kubernetes_version: "1.32.2"
+    crio_version: "1.32.2" 
+  roles:
+    - docker_install
+  tasks:
+    - name: Install Packages
+      apt:
+        state: present
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - software-properties-common
+          - curl
+          - wget
+          - gnupg
+          - sudo
+          - iptables
+          - tmux
+          - keepalived
+          - haproxy
+          - socat
+          - conntrack
+        update_cache: yes
+
+    - name: Create directory for APT keyrings
+      file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: '0755'
+
+    - name: Download Kubernetes GPG key
+      get_url:
+        url: https://pkgs.k8s.io/core:/stable:/{{ kubernetes_version }}/deb/Release.key
+        dest: /tmp/kubernetes-apt-keyring.gpg
+
+    - name: Save Kubernetes GPG key
+      shell: gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg /tmp/kubernetes-apt-keyring.gpg
+      changed_when: false
+
+    - name: Add Kubernetes repository to APT sources
+      copy:
+        content: "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /"
+        dest: /etc/apt/sources.list.d/kubernetes.list
+        mode: '0644'
+
+    - name: Add CRI-O repository key
+      shell: "curl -fsSL https://download.opensuse.org/repositories/isv:/cri-o:/stable:/{{ crio_version }}/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/cri-o-apt-keyring.gpg"
+      args:
+        creates: /etc/apt/keyrings/cri-o-apt-keyring.gpg
+
+    - name: Add CRI-O repository
+      shell: echo "deb [signed-by=/etc/apt/keyrings/cri-o-apt-keyring.gpg] https://download.opensuse.org/repositories/isv:/cri-o:/stable:/{{ crio_version }}/deb/ /" | tee /etc/apt/sources.list.d/cri-o.list
+      args:
+        creates: /etc/apt/sources.list.d/cri-o.list
+
+    - name: Install CRI-O, kubelet, kubeadm, and kubectl
+      apt:
+        name:
+          - cri-o
+          - kubelet
+          - kubeadm
+          - kubectl
+        state: present
+        update_cache: yes
+
+    - name: Start and enable CRI-O
+      systemd:
+        name: crio
+        state: started
+        enabled: yes
+
+    - name: Disable swap
+      command:
+        cmd: swapoff -a
+      ignore_errors: yes
+
+    - name: Load br_netfilter kernel module
+      modprobe:
+        name: br_netfilter
+        state: present
+
+    - name: Install crictl
+      get_url:
+        url: "https://github.com/kubernetes-sigs/cri-tools/releases/download/v1.23.0/crictl-v1.23.0-linux-amd64.tar.gz"
+        dest: "/tmp/crictl.tar.gz"
+    - unarchive:
+        src: "/tmp/crictl.tar.gz"
+        dest: "/usr/local/bin/"
+        remote_src: yes
+
+
+    - name: Comment out swap in /etc/fstab
+      command: sudo sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
+      changed_when: false
+
+    - name: Load overlay kernel module
+      command: sudo modprobe overlay
+      changed_when: false
+
+    - name: Load br_netfilter kernel module
+      command: sudo modprobe br_netfilter
+      changed_when: false
+
+    - name: Configure sysctl for Kubernetes
+      copy:
+        content: |
+          net.bridge.bridge-nf-call-iptables  = 1
+          net.bridge.bridge-nf-call-ip6tables = 1
+          net.ipv4.ip_forward                 = 1
+        dest: /etc/sysctl.d/k8s.conf
+        mode: '0644'
+
+    - name: Apply sysctl settings
+      command: sudo sysctl --system
+      changed_when: false
+
+
+
+- name: Setup master node
+  hosts: master
+  become: yes
+  vars:
+    local_kubeadmin_config: "/mnt/c/Users/serge/Desktop/Letsplay/Tasks/Task_20_K8S/2_ansible/templates/kubead-conf.j2"
+    remote_kubeadmin_config: "$HOME/kubeadm-conf.yaml"
+    user: melnikov
+  roles:
+    - name: Install kubectl to master node
+      role: darkwizard242.kubectl
+      vars:
+        kubectl_version: 1.32.2
+  tasks:
+    - name: Copy kubeadmin-config.yaml to remote machine
+      template:
+        src: "{{ local_kubeadmin_config }}"
+        dest: "{{ remote_kubeadmin_config }}"
+        owner: "{{ user }}"
+        mode: '0644'
+
+    - name: Start kubelet service
+      service:
+        name: kubelet
+        state: started
+        enabled: yes
+
+    - name: Initialize the cluster
+      shell: "kubeadm init --config {{ remote_kubeadmin_config }} >> cluster_initialized.txt"
+      args:
+        chdir: "$HOME"
+        creates: cluster_initialized.txt
+
+    - name: Create .kube directory
+      file:
+        path: "$HOME/.kube"
+        state: directory
+        mode: 0755
+        owner: "{{ user }}"
+
+    - name: Copy admin.conf to user's kube config
+      copy:
+        src: /etc/kubernetes/admin.conf
+        dest: "$HOME/.kube/config"
+        owner: "{{ user }}"
+        group: "{{ user }}"
+        mode: 0644
+        remote_src: yes
+
+    - name: Install Pod network
+      shell: kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml >> pod_network_setup.txt
+      args:
+        chdir: $HOME
+        creates: pod_network_setup.txt
+
+    
+    - name: Get join command
+      shell: kubeadm token create --print-join-command
+      register: join_command_raw
+
+    - name: Set join command
+      set_fact:
+        join_command: "{{ join_command_raw.stdout_lines[0] }}"
+
+
+- name: Join worker nodes to the cluster
+  hosts: workers
+  become: yes
+  tasks:   
+    - name: Join cluster
+      shell: "{{ hostvars[groups['masters'][0]].join_command }} --cri-socket /var/run/cri-dockerd.sock  --ignore-preflight-errors=NumCPU,Mem >> node_joined.txt"
+      args:
+        chdir: $HOME
+        creates: node_joined.txt
+    
+    - name: Label the node
+      command: kubectl label node {{ inventory_hostname }} node-role.kubernetes.io/worker=worker
+      delegate_to: master

@@ -1,7 +1,7 @@
 receivers:
   - name: 'slack'
     slack_configs:
-      - api_url: 'https://hooks.slack.com/services/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'  # Slack Webhook URL
+      - api_url: 'https://hooks.slack.com/services/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'  # Slack Webhook URL
         channel: '#all-arkselen'
         send_resolved: true
 

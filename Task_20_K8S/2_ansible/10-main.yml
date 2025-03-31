@@ -1,0 +1,9 @@
+---
+- name: Setup Docker and Kubernetes
+  import_playbook: 20-setup_docker_kubernetes.yml
+
+- name: Initialize Kubernetes Cluster
+  import_playbook: 30-kubernetes_cluster_setup.yml
+
+- name: Add Worker Nodes to Kubernetes Cluster
+  import_playbook: 40-add_worker_node.yml

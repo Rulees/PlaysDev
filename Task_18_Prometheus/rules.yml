@@ -1,9 +1,9 @@
   groups:
   - name: First instance alerts
     rules:
-      # CPU load is > 1%
+      # CPU load is > xx%
       - alert: HostHighCpuLoad
-        expr: 100 * (1 - avg by(instance) (irate(node_cpu_seconds_total{mode="idle, metric="cpu"}[1m]))) > 0.001
+        expr: 100 * (1 - avg by(instance) (irate(node_cpu_seconds_total{mode="idle",metric="cpu"}[1m]))) > 0.001
         for: 5s
         labels:
           severity: warning

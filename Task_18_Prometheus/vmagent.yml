@@ -24,13 +24,13 @@ scrape_configs:
   - job_name: instances
     yandexcloud_sd_configs:
       - service: compute
-        yandex_passport_oauth_token: "y0_AgAAAABuzFxNAATuwQAAAAEW1GWdAACDtg5vCthLe603VZW8ixNFHBndGg"
+        yandex_passport_oauth_token: "y0_AgAAAABuzFxNAATuwQAAAAEW1GWdAACDtg5vCthLe603VZW8ixNFHBnGg"
     relabel_configs:
       - source_labels: [__meta_yandexcloud_instance_label_metric]                                               # Get label "metric" from YC. 
         target_label: "metric"                                                                                  # name of existed/new label in Prometheus
         replacement: "$1"                                                                                       # get value of label "metric_type" from every vm and write: 
 
-      - source_labels: [__meta_yandexcloud_instance_public_ip_0]                                                # get public_ip
+      - source_labels: [__meta_yandexcloud_instance_public_ip_0]                                                # get public_ip 3d
         target_label: __address__
         replacement: "$1:9100"
 

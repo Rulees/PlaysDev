@@ -1,0 +1,42 @@
+- name: Установка Docker и запуск контейнера
+  hosts: ubuntu
+  become: yes
+  vars: 
+    - docker_container: nginx_container
+  tasks:
+    - name: WITH TAG NGINX
+      tags: nginx
+      block:
+      - include_role:
+          name: docker_install
+
+      - name: Copy .env to remote server
+        copy:
+          src: "./files/.env"   # local
+          dest: "/.env"         # remote
+          mode: '0644'
+
+      - name: Launch/Relaunch Docker container
+        docker_container:
+          state: started
+          name: "{{ docker_container }}"
+          image: "{{ docker_image }}"
+          restart_policy: always
+          env_file: "/.env"
+          ports:
+            - "80:80"
+            - "443:443"
+          recreate: yes
+
+    - name: NGINX_OFF
+      tags: nginx_off
+      block:
+      - name: Remove Docker container
+        docker_container:
+          state: absent
+          name: "{{ docker_container }}"
+          
+      - name: Remove Docker image
+        docker_image:
+          state: absent
+          name: "{{ docker_image }}"

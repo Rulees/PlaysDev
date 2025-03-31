@@ -1,0 +1,122 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+data:
+  nginx.conf: |
+    user www-data www-data;
+    worker_processes auto;
+    include /etc/nginx/modules-enabled/*.conf;
+    events {
+        worker_connections 1024;
+        multi_accept on;
+    }
+
+    http {
+
+        ##
+        # BASIC SETTINGS
+        ##
+
+        sendfile on;
+        tcp_nopush on;
+        types_hash_max_size 2048;
+        # server_tokens off;
+
+        # server_names_hash_bucket_size 64;
+        # server_name_in_redirect off;
+
+        include /etc/nginx/mime.types;
+        default_type application/octet-stream;
+
+        ##
+        # SSL Settings
+        ##
+
+        ssl_protocols TLSv1 TLSv1.1 TLSv1.2 TLSv1.3; # Dropping SSLv3, ref: POODLE
+        ssl_prefer_server_ciphers on;
+
+        ##
+        # Logging Settings
+        ##
+
+        error_log /var/log/nginx/debug.log debug;
+
+        log_format upstreamlog '$remote_addr - $remote_user [$time_local] '
+        '"$request" $status $body_bytes_sent '
+        '"$http_referer" "$http_user_agent" '
+        '"$upstream_addr" "$upstream_status"';
+
+        ##
+        # Caching Settings
+        ##
+
+        fastcgi_cache_path /tmp/nginx_cache levels=1:2 keys_zone=microcache:10m max_size=500m;
+        fastcgi_cache_key $scheme$request_method$host$request_uri;
+
+        ##
+        # Gzip Settings
+        ##
+
+        gzip on;
+        gzip_min_length 200; # min file size to use gzip
+        gzip_comp_level 4; # 1-10 .From 2-4 don't require much resources
+        gzip_disable "msie6"; # disable gzip for browser - microsoft
+        gzip_types text/plain text/css text/javascript text/csv text/xml;
+        gzip_types application/pdf application/postscript application/x-javascript;
+        gzip_types application/esmascript application/javascript application/json;
+        gzip_types image/svg+xml;
+        # gzip_vary on;
+        # gzip_proxied any;
+        # gzip_buffers 16 8k;
+        # gzip_http_version 1.1;
+
+        ##
+        # Virtual Host Configs
+        ##
+
+        # include /etc/nginx/conf.d/*.conf;
+        include /etc/nginx/sites-enabled/*;
+
+        ##
+        # Security
+        ##
+
+        add_header X-Frame-Options SAMEORIGIN;
+    }
+  arkselen.ru.conf: |
+    server {
+      listen 80;
+      server_name 0.0.0.0;
+
+      root /sites/starter;
+      index index.html;
+
+      location / {
+          try_files $uri $uri/ =404;
+      }
+
+      ###
+      # Other
+      ###
+
+      location /secondpage {
+          root /sites/starter;
+          try_files $uri /secondpage.html;
+      }
+
+      location /music {
+          alias /sites/starter/music/;
+
+          default_type audio/mpeg;
+          add_header Content-Disposition 'attachment; filename="$uri"';
+
+          try_files $uri $uri/music.mp3 =404;
+      }
+
+      location /secondserver {
+          proxy_pass https://2ip.ru/;
+      }
+    }
+
+    
