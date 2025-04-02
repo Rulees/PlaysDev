@@ -1,0 +1,1 @@
+Repository for my traineeship as a Devops specialist
