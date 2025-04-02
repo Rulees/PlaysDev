@@ -1,0 +1,4 @@
+# plugin: yc_compute
+# yc_token: "{{ lookup('env', 'OAUTH_TOKEN') }}"
+yc_clouds: "default"
+yc_folders: "trainee-6"

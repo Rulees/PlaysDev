@@ -1,0 +1,30 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: kube-state-ingress
+  namespace: monitoring
+  labels:
+    name: kube-state-ingress
+  annotations:
+    # nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/use-regex: "true"
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: arkse.ddns.net
+    http:
+      paths:
+          # - pathType: ImplementationSpecific
+            # path: "/grafana(/|$)(.*)"
+          - pathType: Prefix
+            path: "/grafana"
+            backend:
+              service:
+                      name: kube-prom-stack-grafana
+                      port:
+                        number: 80
+  
+  tls:                                                                         # don't specify while secret wasn't created
+  - hosts:
+    - "arkse.ddns.net"
+    secretName: tls-secret

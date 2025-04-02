@@ -1,0 +1,28 @@
+# CHECK
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer                                     # Issuer/ClusterIssuer
+metadata:
+  name: letsencrypt
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory  # remove staging after check: 
+    email: darkmelnik777@gmail.com
+    privateKeySecretRef:
+      name: letsencrypt
+    solvers:
+      - http01:
+          ingress:
+            class: nginx
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: le-crt
+spec:
+  secretName: tls-secret
+  issuerRef:
+    kind: ClusterIssuer                                  # Issuer/ClusterIssuer
+    name: letsencrypt
+  commonName: arkse.ddns.net      # repeat
+  dnsNames:
+  - arkse.ddns.net                # repeat

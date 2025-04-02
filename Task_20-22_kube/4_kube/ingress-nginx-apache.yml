@@ -1,0 +1,32 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-nginx
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    # cert-manager.io/cluster-issuer: letsencrypt                        # issuer/cluster-issuer
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: arkse.ddns.net
+    http:
+      paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                      name: nginx
+                      port:
+                        number: 80
+          - pathType: ImplementationSpecific
+            path: "/.*\\.php$"
+            backend:
+              service:
+                      name: apache
+                      port:
+                        number: 80 
+  tls:                                                                         # don't specify while secret wasn't created
+  - hosts:
+    - "arkse.ddns.net"
+    secretName: tls-secret
+---
